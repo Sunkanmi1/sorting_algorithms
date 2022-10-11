@@ -1,44 +1,65 @@
 #include "sort.h"
-#include <stdlib.h>
-#include <stdio.h>
 
 /**
- * counting_sort - Algorithm counting sort
- *@array: array to order
- *@size: size of array
- * Return: Always 0
- */
+* find_max - find largest number in array
+* @array: array
+* @size: size of array
+* Return: the largest number
+*/
+
+int find_max(int *array, size_t size)
+{
+	unsigned int i;
+	int max;
+
+	max = 0;
+	for (i = 0; i < size; i++)
+	{
+		if (array[i] > max)
+			max = array[i];
+	}
+	return (max);
+}
+
+/**
+* counting_sort - sorts an array of integers
+* @array: array
+* @size: size of array
+*/
 
 void counting_sort(int *array, size_t size)
 {
-	int *new_array, *array_sorted;
-	int i, range, j, a, pos;
+	int i, max, *c, *aux;
 
-	range = 0;
-	if (size > 2)
+	if (size < 2)
+		return;
+	if (array == NULL)
+		return;
+	aux = malloc(sizeof(int) * size);
+	if (aux == NULL)
+		return;
+	max = find_max(array, size);
+	c = malloc(sizeof(int) * (max + 1));
+	if (c == NULL)
+		return;
+	for (i = 0; i < max + 1; i++)
+		c[i] = 0;
+	for (i = 0; (unsigned int)i < size; i++)
+		c[array[i]]++;
+	for (i = 1; i <= max; i++)
+		c[i] += c[i - 1];
+	print_array(c, max + 1);
+	for (i = 0; (unsigned int)i < size; i++)
 	{
-		for (i = 0; i < (int)size; i++)
-			if (array[i] > range)
-				range = array[i];
-		new_array = malloc((range + 1)*sizeof(int));
-		for (i = 0; i <= range + 1; i++)
-			new_array[i] = 0;
-		for (i = 0; i < (int)size; i++)
-			new_array[array[i]]++;
-		for (i = 1; i <= range + 1; i++)
-			new_array[i] = new_array[i] + new_array[i - 1];
-		print_array(new_array, range + 1);
-		array_sorted =  malloc(size * sizeof(int));
-		for (j = size - 1; j >= 0; j--)
-		{
-			a = array[j];
-			pos = new_array[a];
-			new_array[a]--;
-			array_sorted[pos - 1] = a;
-		}
-		for (i = 0; i < (int)size; i++)
-			array[i] = array_sorted[i];
-		free(new_array);
-		free(array_sorted);
+		aux[c[array[i]] - 1] = array[i];
+		c[array[i]]--;
 	}
+	 i = 0;
+	while (i < (int)size)
+	{
+		array[i] = aux[i];
+		i++;
+	}
+	free(c);
+	free(aux);
 }

@@ -1,80 +1,97 @@
 #include "sort.h"
-/**
- * insertion_sort_list - Insertion sort list
- * @list: Pointer to list to sort
- **/
-void insertion_sort_list(listint_t **list)
-{
-	listint_t *aux = *list;
-	listint_t *aux2 = NULL;
 
-	while (aux->next != NULL)
+/**
+* dlistint_len - function that returns number of elements
+* @h: doubly linked list
+* Return: numbe of elements in a linked list
+*/
+
+size_t dlistint_len(const listint_t *h)
+{
+	int count = 0;
+
+	while (h != NULL)
 	{
-		if (aux->n > aux->next->n)
-		{
-			swap_node(list, aux, aux->next);
-			print_list(*list);
-			aux2 = aux->prev;
-			if (aux->next == NULL && aux->prev == NULL)
-				return;
-			while (aux2->prev != NULL)
-			{
-				if (aux2->n < aux2->prev->n)
-				{
-					swap_node(list, aux2->prev, aux2);
-					print_list(*list);
-					aux2 = aux2->next;
-				}
-				else
-					break;
-				aux2 = aux2->prev;
-			}
-			aux = aux->prev;
-		}
-		aux = aux->next;
+		h = h->next;
+		count++;
 	}
+return (count);
 }
 
 /**
- * swap_node - Change items
- * @list: Array
- * @aux1: Position 1
- * @aux2: Position 2
- **/
-void swap_node(listint_t **list, listint_t *aux1, listint_t *aux2)
+* get_dnodeint_at_index - returns the nth node of a dubly linked list
+* @head: doubly linked list
+* @index: index of the node
+* Return: returns data of a node
+*/
+
+listint_t *get_dnodeint_at_index(listint_t *head, unsigned int index)
 {
-	if (aux1->prev == NULL && aux2->next == NULL)
+	unsigned int count = 0;
+	listint_t *current = head;
+
+	while (current != NULL)
 	{
-		*list = aux2;
-		aux2->prev = NULL;
-		aux1->next = NULL;
-		aux2->next = aux1;
-		aux2->prev = aux2;
+		if (count == index)
+		{
+			return (current);
+		}
+		current = current->next;
+		count++;
 	}
-	else if (aux1->prev == NULL)
+return (current);
+}
+
+/**
+* _swap - swaps the top two elements of the stack
+* @left: node left
+* @right: node right
+*/
+
+void _swap(listint_t *left, listint_t *right)
+{
+
+	if (left->prev)
+		left->prev->next = right;
+	if (right->next)
+		right->next->prev = left;
+	left->next  = right->next;
+	right->prev = left->prev;
+	right->next = left;
+	left->prev = right;
+}
+
+/**
+* insertion_sort_list - sorts a doubly linked list of integers
+* @list: doublu linked list
+*/
+
+void insertion_sort_list(listint_t **list)
+{
+	listint_t *left, *right;
+	unsigned int length, i, j;
+
+	if (list == NULL)
+		return;
+	if (!(*list))
+		return;
+	length = dlistint_len((*list));
+	i = 1;
+	while (i < length)
 	{
-		aux2->prev = NULL;
-		aux2->next->prev = aux1;
-		aux1->next = aux2->next;
-		aux2->next = aux1;
-		aux1->prev = aux2;
-		*list = aux2;
-	}
-	else if (aux2->next == NULL)
-	{
-		aux1->next = NULL;
-		(aux1->prev)->next = aux2;
-		aux2->next = aux1;
-		aux2->prev = aux1->prev;
-		aux1->prev = aux2;
-	}
-	else
-	{
-		(aux1->prev)->next = aux2;
-		(aux2->next)->prev = aux1;
-		aux1->next = aux2->next;
-		aux2->prev = aux1->prev;
-		aux1->prev = aux2;
-		aux2->next = aux1;
+		j = i;
+		right = get_dnodeint_at_index((*list), i);
+		left = get_dnodeint_at_index((*list), i - 1);
+		while (j > 0 &&  left->n > right->n)
+		{
+			_swap(left, right);
+			if (right->prev == NULL)
+				(*list) = right;
+			print_list((*list));
+			j--;
+			right = get_dnodeint_at_index((*list), j);
+			left = get_dnodeint_at_index((*list), j - 1);
+		}
+		i++;
 	}
 }
